@@ -1,5 +1,6 @@
 import { makeTask } from "../../../test/factories/task-factory";
 import { InMemoryTasksRepository } from "../../../test/repositories/in-memory-tasks-repository";
+import { NotFoundError } from "../../infra/http/errors/not-found";
 import { TasksRepository } from "../repositories/tasks-repository";
 import { UpdateTask } from "./update-task-use-case";
 
@@ -17,7 +18,7 @@ describe("UpdateTask", () => {
 
     const task = makeTask();
 
-    tasksRepository.findById = jest.fn().mockResolvedValueOnce(task);
+    tasksRepository.findById = jest.fn().mockResolvedValue(task);
 
     const response = await sut.execute({
       id: 1,
@@ -32,7 +33,7 @@ describe("UpdateTask", () => {
   it("should mark a task as concluded", async () => {
     const task = makeTask();
 
-    tasksRepository.findById = jest.fn().mockResolvedValueOnce(task);
+    tasksRepository.findById = jest.fn().mockResolvedValue(task);
 
     const response = await sut.execute({
       id: 1,
@@ -45,7 +46,7 @@ describe("UpdateTask", () => {
   });
 
   it("should throw an error if the task does not exist", async () => {
-    tasksRepository.findById = jest.fn().mockResolvedValueOnce(undefined);
+    tasksRepository.findById = jest.fn().mockResolvedValue(undefined);
 
     await expect(
       sut.execute({
@@ -53,6 +54,6 @@ describe("UpdateTask", () => {
         title: "Task",
         concluded: false,
       })
-    ).rejects.toThrow("Task not found");
+    ).rejects.toThrow(NotFoundError);
   });
 });

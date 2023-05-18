@@ -1,4 +1,5 @@
 import { InMemoryTasksRepository } from "../../../test/repositories/in-memory-tasks-repository";
+import { NotFoundError } from "../../infra/http/errors/not-found";
 import { TasksRepository } from "../repositories/tasks-repository";
 import { DeleteTask } from "./delete-task-use-case";
 
@@ -33,7 +34,7 @@ describe("DeleteTask", () => {
     tasksRepository.findById = jest.fn().mockResolvedValue(null);
     tasksRepository.delete = jest.fn();
 
-    await expect(sut.execute({ taskId })).rejects.toThrow("Task not found");
+    await expect(sut.execute({ taskId })).rejects.toThrow(NotFoundError);
 
     expect(tasksRepository.findById).toHaveBeenCalledWith(taskId);
     expect(tasksRepository.delete).not.toHaveBeenCalled();
