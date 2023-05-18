@@ -1,3 +1,4 @@
+import { NotFoundError } from "../../infra/http/errors/not-found";
 import { Task } from "../entities/task";
 import { TasksRepository } from "../repositories/tasks-repository";
 
@@ -20,7 +21,7 @@ export class UpdateTask {
     const task = await this.tasksRepositories.findById(id);
 
     if (!task) {
-      throw new Error("Task not found");
+      throw new NotFoundError(`Task with id ${id} not found`);
     }
 
     task.title = title;

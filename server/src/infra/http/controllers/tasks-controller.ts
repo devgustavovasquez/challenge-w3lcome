@@ -1,4 +1,4 @@
-import { Application, Request, Response } from "express";
+import { Application, NextFunction, Request, Response } from "express";
 
 import { TasksRepository } from "../../../domain/repositories/tasks-repository";
 import { InMemoryTasksRepository } from "../../database/repositories/in-memory-tasks-repository";
@@ -23,52 +23,68 @@ export class TasksController {
   private registerRoutes() {
     this.application.get(
       "/tasks",
-      async (request: Request, response: Response) => {
-        const listAllTasks = new ListAllTasks(this.tasksRepository);
-        const { tasks } = await listAllTasks.execute();
+      async (request: Request, response: Response, next: NextFunction) => {
+        try {
+          const listAllTasks = new ListAllTasks(this.tasksRepository);
+          const { tasks } = await listAllTasks.execute();
 
-        return response.status(200).send(tasks.map(TaskViewModel.toHTTP));
+          return response.status(200).send(tasks.map(TaskViewModel.toHTTP));
+        } catch (error) {
+          next(error);
+        }
       }
     );
 
     this.application.post(
       "/tasks",
-      async (request: Request, response: Response) => {
-        const { title } = request.body;
+      async (request: Request, response: Response, next: NextFunction) => {
+        try {
+          const { title } = request.body;
 
-        const createTask = new CreateTask(this.tasksRepository);
-        const { task } = await createTask.execute({ title });
+          const createTask = new CreateTask(this.tasksRepository);
+          const { task } = await createTask.execute({ title });
 
-        return response.status(201).json(TaskViewModel.toHTTP(task));
+          return response.status(201).json(TaskViewModel.toHTTP(task));
+        } catch (error) {
+          next(error);
+        }
       }
     );
 
     this.application.patch(
       "/tasks/:id",
-      async (request: Request, response: Response) => {
-        const { id } = request.params;
-        const { title, concluded } = request.body;
+      async (request: Request, response: Response, next: NextFunction) => {
+        try {
+          const { id } = request.params;
+          const { title, concluded } = request.body;
 
-        const updateTask = new UpdateTask(this.tasksRepository);
-        const { task } = await updateTask.execute({
-          id: parseInt(id),
-          title,
-          concluded,
-        });
+          const updateTask = new UpdateTask(this.tasksRepository);
+          const { task } = await updateTask.execute({
+            id: parseInt(id),
+            title,
+            concluded,
+          });
 
-        return response.status(200).json(TaskViewModel.toHTTP(task));
+          return response.status(200).json(TaskViewModel.toHTTP(task));
+        } catch (error) {
+          next(error);
+        }
       }
     );
 
     this.application.delete(
       "/tasks/:id",
-      async (request: Request, response: Response) => {
-        const { id } = request.params;
+      async (request: Request, response: Response, next: NextFunction) => {
+        try {
+          const { id } = request.params;
 
-        const deleteTask = new DeleteTask(this.tasksRepository);
-        await deleteTask.execute({ taskId: parseInt(id) });
+          const deleteTask = new DeleteTask(this.tasksRepository);
+          await deleteTask.execute({ taskId: parseInt(id) });
 
-        return response.status(204).send();
+          return response.status(204).send();
+        } catch (error) {
+          next(error);
+        }
       }
     );
   }

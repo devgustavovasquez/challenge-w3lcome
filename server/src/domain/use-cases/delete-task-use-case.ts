@@ -1,3 +1,4 @@
+import { NotFoundError } from "../../infra/http/errors/not-found";
 import { Task } from "../entities/task";
 import { TasksRepository } from "../repositories/tasks-repository";
 
@@ -16,7 +17,7 @@ export class DeleteTask {
     const task = await this.tasksRepositories.findById(taskId);
 
     if (!task) {
-      throw new Error("Task not found");
+      throw new NotFoundError(`Task with id ${taskId} not found`);
     }
 
     await this.tasksRepositories.delete(task);
