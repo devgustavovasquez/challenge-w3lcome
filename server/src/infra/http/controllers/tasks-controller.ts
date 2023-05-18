@@ -8,6 +8,9 @@ import { CreateTask } from "../../../domain/use-cases/create-task-use-case";
 import { DeleteTask } from "../../../domain/use-cases/delete-task-use-case";
 import { UpdateTask } from "../../../domain/use-cases/update-task-use-case";
 import { TaskViewModel } from "../view-models/task-view-model";
+import { validateIdParams } from "../../../utils/validate-id-params";
+import { validateTitleBody } from "../../../utils/validate-title-body";
+import { validateConcludedBody } from "../../../utils/validate-concluded-body";
 
 export class TasksController {
   private readonly application: Application;
@@ -23,7 +26,7 @@ export class TasksController {
   private registerRoutes() {
     this.application.get(
       "/tasks",
-      async (request: Request, response: Response, next: NextFunction) => {
+      async (_request: Request, response: Response, next: NextFunction) => {
         try {
           const listAllTasks = new ListAllTasks(this.tasksRepository);
           const { tasks } = await listAllTasks.execute();
@@ -37,6 +40,7 @@ export class TasksController {
 
     this.application.post(
       "/tasks",
+      validateTitleBody,
       async (request: Request, response: Response, next: NextFunction) => {
         try {
           const { title } = request.body;
@@ -53,6 +57,7 @@ export class TasksController {
 
     this.application.patch(
       "/tasks/:id",
+      [validateTitleBody, validateConcludedBody, validateIdParams],
       async (request: Request, response: Response, next: NextFunction) => {
         try {
           const { id } = request.params;
@@ -74,6 +79,7 @@ export class TasksController {
 
     this.application.delete(
       "/tasks/:id",
+      validateIdParams,
       async (request: Request, response: Response, next: NextFunction) => {
         try {
           const { id } = request.params;
