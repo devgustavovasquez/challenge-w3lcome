@@ -1,8 +1,22 @@
+import Card from './components/Card/Card'
 import Navbar from './components/Navbar'
+import { useQuery } from './hooks/useQuery'
+import { Task } from './models/task'
+import { TaskService } from './services/task/TaskService'
 
 export default function App() {
+  const { data, isLoading, error } = useQuery<Task[]>(TaskService.listAll)
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>
+  }
+
   return (
-    <div className="h-screen bg-indigo-50">
+    <div className="flex h-screen flex-col bg-indigo-50">
       <Navbar />
       <div className="mt-8 flex h-full flex-col items-center">
         <div className="w-full max-w-md p-8">
@@ -20,31 +34,10 @@ export default function App() {
             </button>
           </div>
 
-          <ul className="flex w-full flex-col gap-4">
-            <li className="flex min-h-[6rem] w-full items-center justify-between rounded-md bg-white px-4 py-7 shadow-md">
-              <span className="max-w-[14rem] break-words text-base text-zinc-700">
-                Limpar Toda a Casa e o Quintal e o Jardim e a Garagem e a Sala e
-                o Quarto e a Cozinha e o Banheiro e a Lavanderia e a Varanda e a
-                Área de Serviço
-              </span>
-              <div className="flex h-full flex-col items-end justify-between">
-                <span className="text-zinc-400">#1</span>
-                <span className="text-sm font-semibold text-red-400">
-                  Pendente
-                </span>
-              </div>
-            </li>
-            <li className="flex min-h-[6rem] w-full items-center justify-between rounded-md bg-white px-4 py-7 shadow-md">
-              <span className="max-w-[14rem] break-words text-base text-zinc-700">
-                Preparar o Almoço
-              </span>
-              <div className="flex h-full flex-col items-end justify-between">
-                <span className="text-zinc-400">#1</span>
-                <span className="text-sm font-semibold text-green-400">
-                  Concluída
-                </span>
-              </div>
-            </li>
+          <ul className="flex max-h-[40rem] w-full flex-col gap-4 overflow-y-auto scroll-smooth py-4 pr-1">
+            {data?.map((task) => (
+              <Card key={task.id} {...task} />
+            ))}
           </ul>
         </div>
       </div>
