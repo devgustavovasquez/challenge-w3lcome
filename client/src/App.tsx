@@ -1,11 +1,28 @@
+import { useEffect, useState } from 'react'
 import Card from './components/Card/Card'
+import InputTask from './components/InputTask/InputTask'
 import Navbar from './components/Navbar'
 import { useQuery } from './hooks/useQuery'
 import { Task } from './models/task'
 import { TaskService } from './services/task/TaskService'
 
 export default function App() {
+  const [tasks, setTasks] = useState<Task[]>([])
   const { data, isLoading, error } = useQuery<Task[]>(TaskService.listAll)
+
+  useEffect(() => {
+    if (data) {
+      setTasks(data)
+    }
+
+    return () => {
+      setTasks([])
+    }
+  }, [data])
+
+  function handleAddTask(newTask: Task) {
+    setTasks((prevTasks) => [...prevTasks, newTask])
+  }
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -24,18 +41,10 @@ export default function App() {
             Tarefas
           </h2>
 
-          <div className="my-6 flex w-full items-center justify-between gap-4">
-            <input
-              type="text"
-              className="w-full rounded-md border border-gray-300 px-4 py-2"
-            />
-            <button className="rounded-md border border-gray-300 bg-zinc-700 px-4 py-2 font-semibold text-white">
-              +
-            </button>
-          </div>
+          <InputTask onAddTask={handleAddTask} />
 
           <ul className="flex max-h-[40rem] w-full flex-col gap-4 overflow-y-auto scroll-smooth py-4 pr-1">
-            {data?.map((task) => (
+            {tasks.map((task) => (
               <Card key={task.id} {...task} />
             ))}
           </ul>
