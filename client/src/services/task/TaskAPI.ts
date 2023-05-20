@@ -1,9 +1,17 @@
 import axios from 'axios'
 import { Task } from '../../models/task'
 
+function verifyEnvironment() {
+  if (!import.meta.env.VITE_API_URL) {
+    throw new Error('VITE_API_URL is not defined')
+  }
+}
+
+verifyEnvironment()
+
 export class TaskAPI {
   private static readonly url = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: import.meta.env.VITE_API_URL,
   })
 
   public static async listAll() {
