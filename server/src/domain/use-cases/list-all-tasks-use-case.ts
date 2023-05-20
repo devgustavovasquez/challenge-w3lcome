@@ -13,6 +13,8 @@ export class ListAllTasks {
   async execute(request: ListAllTasksRequest): Promise<ListAllTasksResponse> {
     const tasks = await this.tasksRepositories.findAll();
 
-    return { tasks };
+    const sortedTasks = tasks.sort((a, b) => a.id - b.id);
+
+    return { tasks: sortedTasks };
   }
 }

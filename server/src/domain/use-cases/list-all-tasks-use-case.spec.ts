@@ -24,4 +24,21 @@ describe("ListAllTasks", () => {
     expect(response.tasks).toEqual(tasks);
     expect(tasksRepository.findAll).toHaveBeenCalled();
   });
+
+  it("should sort tasks by id", async () => {
+    const tasks = [
+      { id: 3, title: "Task 3", concluded: false },
+      { id: 1, title: "Task 1", concluded: false },
+      { id: 2, title: "Task 2", concluded: true },
+    ];
+    tasksRepository.findAll = jest.fn().mockResolvedValueOnce(tasks);
+
+    const response = await sut.execute();
+
+    expect(response.tasks).toEqual([
+      { id: 1, title: "Task 1", concluded: false },
+      { id: 2, title: "Task 2", concluded: true },
+      { id: 3, title: "Task 3", concluded: false },
+    ]);
+  });
 });
