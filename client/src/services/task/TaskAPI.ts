@@ -15,4 +15,15 @@ export class TaskAPI {
       title,
     })
   }
+
+  public static async update(task: Task) {
+    return this.url.patch(`/tasks/${task.id}`, {
+      title: task.title,
+      concluded: task.concluded,
+    })
+  }
+
+  public static async delete(id: Pick<Task, 'id'>) {
+    return this.url.delete(`/tasks/${id}`)
+  }
 }

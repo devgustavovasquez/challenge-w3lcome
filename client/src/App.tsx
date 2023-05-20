@@ -11,7 +11,7 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([])
   const { data, isLoading, error } = useQuery<Task[]>(TaskService.listAll)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [task, setTask] = useState<Task | null>(null)
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 
   useEffect(() => {
     if (data) {
@@ -27,21 +27,40 @@ export default function App() {
     setTasks((prevTasks) => [...prevTasks, newTask])
   }
 
+  function handleUpdateTask(updatedTask: Task) {
+    setTasks((prevTasks) => {
+      const tasks = [...prevTasks]
+      const taskIndex = tasks.findIndex((task) => task.id === updatedTask.id)
+      tasks[taskIndex] = updatedTask
+      return tasks
+    })
+  }
+
+  function handleDeleteTask(taskId: number) {
+    setTasks((prevTasks) => {
+      const tasks = [...prevTasks]
+      const taskIndex = tasks.findIndex((task) => task.id === taskId)
+      tasks.splice(taskIndex, 1)
+      return tasks
+    })
+  }
+
+  function handleOpenModal(task: Task) {
+    setSelectedTask(task)
+    setIsModalOpen(true)
+  }
+
+  function handleCloseModal() {
+    setSelectedTask(null)
+    setIsModalOpen(false)
+  }
+
   if (isLoading) {
     return <div>Loading...</div>
   }
 
   if (error) {
     return <div>Error: {error.message}</div>
-  }
-
-  function handleOpenModal(task: Task) {
-    setIsModalOpen(true)
-    setTask(task)
-  }
-
-  function handleCloseModal() {
-    setIsModalOpen(false)
   }
 
   return (
@@ -63,7 +82,13 @@ export default function App() {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal} task={task} />
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onUpdateTask={handleUpdateTask}
+        onDeleteTask={handleDeleteTask}
+        task={selectedTask}
+      />
     </div>
   )
 }

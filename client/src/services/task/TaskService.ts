@@ -21,4 +21,24 @@ export class TaskService {
       throw new Error('Error creating task')
     }
   }
+
+  static async update(task: Task) {
+    try {
+      const response = await TaskAPI.update(task)
+
+      return response.data
+    } catch (error) {
+      throw new Error('Error updating task')
+    }
+  }
+
+  static async delete(id: Pick<Task, 'id'>) {
+    try {
+      const response = await TaskAPI.delete(id)
+
+      return response.data
+    } catch (error) {
+      throw new Error('Error deleting task')
+    }
+  }
 }
