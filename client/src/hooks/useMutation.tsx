@@ -7,7 +7,7 @@ type MutationOptions<TData> = {
   onError?: (error: Error) => void
 }
 
-type MutationResult<TData> = {
+type MutationResult = {
   status: MutationStatus
   error: Error | null
   mutate: (variables?: any) => Promise<void>
@@ -18,7 +18,7 @@ type MutationFunction<TData> = (variables?: any) => Promise<TData>
 function useMutation<TData>(
   mutationFn: MutationFunction<TData>,
   options?: MutationOptions<TData>
-): MutationResult<TData> {
+): MutationResult {
   const [status, setStatus] = useState<MutationStatus>('idle')
   const [error, setError] = useState<Error | null>(null)
 
